@@ -1,0 +1,35 @@
+* {
+  box-sizing: border-box;
+}
+
+.grid {
+  position: absolute;
+  height: 500px;
+  width: 600px;
+  border: 1px solid black;
+}
+
+.cell {
+  position: absolute;
+  width: 100px;
+  height: 20px;
+  background-color: red;
+  border: 1px solid black;
+}
+
+.player {
+  position: absolute;
+  width: 100px;
+  height: 20px;
+  background-color: black;
+}
+
+.ball {
+  position: absolute;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background-color: black;
+  border: 1px solid black;
+}
+
