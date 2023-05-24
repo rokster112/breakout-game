@@ -6,15 +6,16 @@ const scoreHTML = document.getElementById('score')
 const livesHTML = document.getElementById('lives')
 const startButton = document.getElementById('start-button')
 const ball = document.createElement('div')
-const gridWidth = 600
+const keyboardButton = document.getElementById('keyboard-button')
+const gridWidth = 800
 const gridHeight = 500
 const cellHeight = 20
 const cellWidth = 100
 const ballDiameter = 10
 const numRows = 8
-const numCols = 6
-const playerStartingPosition = [250, 10]
-const ballStartingPosition = [300, 30]
+const numCols = 8
+const playerStartingPosition = [350, 10]
+const ballStartingPosition = [405, 30]
 const playerCurrentPosition = playerStartingPosition
 const ballCurrentPosition = ballStartingPosition
 grid.appendChild(player)
@@ -23,14 +24,28 @@ let cells = []
 let cell, horDirection, score, lives, intervalTimer, vertDirection
 let highScore = 0
 let disableContinueBtn = true
-
+let mouseOrKeyboard = false
 
 startButton.addEventListener('click', startGame)
+
+keyboardButton.addEventListener('click', function() {
+  mouseOrKeyboard = !mouseOrKeyboard
+  if (mouseOrKeyboard) {
+    keyboardButton.innerHTML = 'Mouse'
+  } else {
+    keyboardButton.innerHTML = 'Keyboard'
+  }
+})
+
 continueButton.addEventListener('click', function() {
   if (!disableContinueBtn && lives > 0) {
     disableContinueBtn = true
     clearInterval(intervalTimer)
-    addEventListener('keydown', playerMovement)
+    if (mouseOrKeyboard) {
+      document.addEventListener('mousemove', playerMouseMovement)
+    } else {
+      addEventListener('keydown', playerKeyboardMovement)
+    }
     settingInterval()
   }
 })
@@ -54,7 +69,11 @@ function startGame() {
   placeBall()
   randomHorizontalDirection()
   settingInterval()
-  addEventListener('keydown', playerMovement)
+  if (mouseOrKeyboard) {
+    document.addEventListener('mousemove', playerMouseMovement)
+  } else {
+    addEventListener('keydown', playerKeyboardMovement)
+  }
 }
 
 function addCells() {
@@ -81,19 +100,29 @@ function placeBall() {
   ball.style.bottom = ballStartingPosition[1] + 'px'
 }
 
-function playerMovement(e) {
+function playerKeyboardMovement(e) {
   const keyCode = e.keyCode
   const left = 37
   const right = 39
-  
+
   if (left === keyCode && playerCurrentPosition[0] > 0) {
     playerCurrentPosition[0] -= 25
     player.style.left = playerCurrentPosition[0] + 'px'
-  } else if (right === keyCode && playerCurrentPosition[0] < 500) {
+  } else if (right === keyCode && playerCurrentPosition[0] < 700) {
     playerCurrentPosition[0] += 25
     player.style.left = playerCurrentPosition[0] + 'px'
   }
   placePlayer()
+}
+
+function playerMouseMovement(e) {
+  const mouse = e.clientX
+  const mouseMovement = mouse - cellWidth / 2
+
+  if (mouseMovement >= 0 && mouseMovement <= 700) {
+    playerCurrentPosition[0] = mouseMovement
+    player.style.left = mouseMovement + 'px'
+  }
 }
 
 function movingBall() {
@@ -118,13 +147,13 @@ function checkHighScore() {
 }
 
 function speedingUpBall() {
-  if (score === 100) {
+  if (score === 160) {
     vertDirection = vertDirection < 0 ? vertDirection - 1 : vertDirection + 1
-  } else if (score === 200) {
-    vertDirection = vertDirection < 0 ? vertDirection - 1 : vertDirection + 1
-  } else if (score === 300) {
+  } else if (score === 280) {
     vertDirection = vertDirection < 0 ? vertDirection - 1 : vertDirection + 1
   } else if (score === 400) {
+    vertDirection = vertDirection < 0 ? vertDirection - 1 : vertDirection + 1
+  } else if (score === 520) {
     vertDirection = vertDirection < 0 ? vertDirection - 1 : vertDirection + 1
   }
 }
@@ -220,22 +249,24 @@ function losingLives() {
     placeBall()
     placePlayer()
     movingBall()
-    removeEventListener('keydown', playerMovement)
+    removeEventListener('keydown', playerKeyboardMovement)
+    document.removeEventListener('mousemove', playerMouseMovement)
     clearInterval(intervalTimer)
   }
 }
 
 function resetCurrentPositions() {
-  playerCurrentPosition[0] = 250
+  playerCurrentPosition[0] = 350
   playerCurrentPosition[1] = 10
-  ballCurrentPosition[0] = 300
+  ballCurrentPosition[0] = 405
   ballCurrentPosition[1] = 35
 }
 
 function winningGame() {
   scoreHTML.innerHTML = `${score} - You win ! ! !`
   clearInterval(intervalTimer)
-  removeEventListener('keydown', playerMovement)
+  removeEventListener('keydown', playerKeyboardMovement)
+  document.removeEventListener('mousemove', playerMouseMovement)
   checkHighScore()
 }
 
@@ -243,5 +274,6 @@ function gameOver() {
   checkHighScore()
   scoreHTML.innerHTML = `${score} - You Lose ! ! !`
   clearInterval(intervalTimer)
-  removeEventListener('keydown', playerMovement)
+  removeEventListener('keydown', playerKeyboardMovement)
+  document.removeEventListener('mousemove', playerMouseMovement)
 }
